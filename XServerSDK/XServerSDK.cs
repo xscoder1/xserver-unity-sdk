@@ -14,7 +14,7 @@ using SimpleJSON;
 public class XServerSDK : MonoBehaviour {
 
 	// PASTE YOUR DATABASE PATH HERE:
-	public static String DATABASE_PATH = "https://xserver.app/__apps/xserver/";
+	public static String DATABASE_PATH = "https://yourdomain.com/xserver/";
 
 	// SET THE NAME OF YOUR GAME
 	public static String GAME_NAME = "XServer";
