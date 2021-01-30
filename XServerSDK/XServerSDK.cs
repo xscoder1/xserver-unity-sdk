@@ -266,43 +266,46 @@ public class XServerSDK : MonoBehaviour {
 	// XSGetPointer -> GET OBJECT POINTER
 	//-------------------------------------------
 	public static JSONNode XSGetPointer(String tableName, String id) {
-    	var request = (HttpWebRequest)WebRequest.Create(TABLES_PATH + tableName + ".json");
-		request.Method = "POST";
-		request.ContentType = "application/x-www-form-urlencoded";
-		var response = (HttpWebResponse)request.GetResponse();
-		var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+    	  var request = (HttpWebRequest)WebRequest.Create(TABLES_PATH + "m-query.php?");
+	  var postData = "tableName=" + tableName;
+	  var data = Encoding.ASCII.GetBytes(postData);
+	  request.Method = "POST";
+	  request.ContentType = "application/x-www-form-urlencoded";
+	  request.ContentLength = data.Length;
+	  using (var stream = request.GetRequestStream()) { stream.Write(data, 0, data.Length); }
+	  var response = (HttpWebResponse)request.GetResponse();
+	  var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
 
-		// Debug.Log("XSGetPointer -> RESPONSE: " + responseString);
+	  // Debug.Log("XSGetPointer -> RESPONSE: " + responseString);
 
-		var pointerObj = JSON.Parse("{}");
+	  var pointerObj = JSON.Parse("{}");
 
-		if (responseString == XS_ERROR) {
-			simpleAlert(XS_ERROR);
-			pointerObj = null;
-			
-		} else {
-			var objects = JSON.Parse(responseString);
-			var ok = false;
+	  if (responseString == XS_ERROR) {
+		simpleAlert(XS_ERROR);
+		pointerObj = null;
+	  } else {
+		var objects = JSON.Parse(responseString);
+		var ok = false;
 
-			// Search for pointer object
-			if (objects.Count != 0) {
-				for (int p=0; p<objects.Count; p++) {
-					var obj = objects[p];
-					if (obj["ID_id"] == id) {
-						ok = true;
-						pointerObj = obj;
-					}
+		// Search for pointer object
+		if (objects.Count != 0) {
+			for (int p=0; p<objects.Count; p++) {
+				var obj = objects[p];
+				if (obj["ID_id"] == id) {
+					ok = true;
+					pointerObj = obj;
+				}
 
-					// Object not found
-					if (p == objects.Count - 1 && !ok) {
-						pointerObj = null;
-						simpleAlert(E_103);
-					}
-				} // ./ For
+				// Object not found
+				if (p == objects.Count - 1 && !ok) {
+					pointerObj = null;
+					simpleAlert(E_103);
+				}
+			} // ./ For
 
-			// Object not found
-			} else { pointerObj = null; simpleAlert(E_103); }
-		} //./ If
+		// Object not found
+		} else { pointerObj = null; simpleAlert(E_103); }
+	} //./ If
 
 	return pointerObj;
 	}
@@ -312,9 +315,13 @@ public class XServerSDK : MonoBehaviour {
 	// XSRefreshObjectData -> REFRESH OBJECT'S DATA
 	//-------------------------------------------
 	public static JSONNode XSRefreshObjectData(String tableName, JSONNode jsonObj) {
-    	var request = (HttpWebRequest)WebRequest.Create(TABLES_PATH + tableName + ".json");
+    		var request = (HttpWebRequest)WebRequest.Create(TABLES_PATH + "m-query.php?");
+		var postData = "tableName=" + tableName;
+		var data = Encoding.ASCII.GetBytes(postData);
 		request.Method = "POST";
 		request.ContentType = "application/x-www-form-urlencoded";
+		request.ContentLength = data.Length;
+		using (var stream = request.GetRequestStream()) { stream.Write(data, 0, data.Length); }
 		var response = (HttpWebResponse)request.GetResponse();
 		var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
 
@@ -325,7 +332,6 @@ public class XServerSDK : MonoBehaviour {
 		if (responseString == XS_ERROR) {
 			simpleAlert(XS_ERROR);
 			refreshedObj = null;
-			
 		} else {
 			var objects = JSON.Parse(responseString);
 			for (int r=0; r<objects.Count; r++) {
